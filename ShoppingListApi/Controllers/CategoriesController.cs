@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using ShoppingListApi.Dtos.Category;
+using ShoppingListApi.Helpers;
 using ShoppingListApi.Interfaces;
 using ShoppingListApi.Models;
 
@@ -60,16 +62,18 @@ namespace ShoppingListApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetCategories()
+        public async Task<IActionResult> GetCategories([FromQuery] PaginationParams pagParams)
         {
             try
             {
-                var categories = await _repo.Get();
+                var categories = await _repo.Get(pagParams);
                 if (categories == null)
                 {
                     return NotFound();
                 }
-                return Ok(categories);
+                var catToReturn = _mapper.Map<IEnumerable<CategoryListDto>>(categories);
+                Response.AddPagination(categories.CurrentPage,categories.PageSize,categories.TotalCount, categories.TotalPages);
+                return Ok(catToReturn);
             }
             catch (Exception e)
             {

@@ -15,8 +15,20 @@ namespace ShoppingListApi.Helpers
         {
             CreateBothMaps<CategoryUpdateDto, Category>();
             CreateBothMaps<CategoryCreateDto, Category>();
+            CreateMap<Category, CategoryListDto>()
+                .ForMember(dest => dest.CategoryId, opt =>
+                {
+                    opt.MapFrom(src => src.Id);
+                });
             CreateBothMaps<Product, ProductCreateDto>();
             CreateBothMaps<Product, ProductUpdateDto>();
+            CreateMap<Product, ProductListDto>()
+                .ForMember(dest => dest.ProductName, opt => {
+                opt.MapFrom(src => src.ProductName);
+                })
+                .ForMember(dest => dest.CategoryName, opt => {
+                opt.MapFrom(src => src.Category.CategoryName);
+                });
         }
 
         public void CreateBothMaps<TSource, TDestination>()

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using MySql.Data.MySqlClient;
 using ShoppingListApi.Data;
+using ShoppingListApi.Helpers;
 using ShoppingListApi.Models;
 
 namespace ShoppingListApi.Interfaces
@@ -55,10 +56,24 @@ namespace ShoppingListApi.Interfaces
         {
             return await entity.FindAsync(id);
         }
-
-        public async Task<List<TEntity>> Get()
+        public IQueryable<TEntity> GetQueryable(){
+            return entity.AsQueryable();
+        }
+        public async Task<PagedList<TEntity>> Query(IQueryable<TEntity> q, PaginationParams pagParams){
+        
+            return await PagedList<TEntity>.CreateAsync(q, pagParams.PageNumber, pagParams.PageSize);
+            
+        }
+        
+        public async Task<PagedList<TEntity>> Get(PaginationParams pagParams)
         {
-            return await entity.AsQueryable().ToListAsync();
+            var ent= GetQueryable();
+            return await PagedList<TEntity>.CreateAsync(ent, pagParams.PageNumber, pagParams.PageSize);
+            //return await entity.AsQueryable().ToListAsync();
+        }
+
+        public IQueryable<TEntity> Include(IQueryable<TEntity> q, string relation){
+            return q.Include(relation);
         }
 
         public async Task<bool> SaveAll()
