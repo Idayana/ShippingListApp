@@ -18,10 +18,12 @@ namespace ShoppingListApi.Controllers
     {
         private readonly IBaseRepository<Category> _repo;
         private readonly IMapper _mapper;
-        public CategoriesController(IBaseRepository<Category> repo, IMapper mapper)
+        private readonly ICategoryRepository _catRepo;
+        public CategoriesController(IBaseRepository<Category> repo, IMapper mapper, ICategoryRepository catRepo)
         {
             _repo = repo;
             _mapper = mapper;
+            _catRepo = catRepo;
 
         }
         [HttpPost]
@@ -31,13 +33,20 @@ namespace ShoppingListApi.Controllers
             {
                 return BadRequest(ModelState);
             }
+            
+            var result = _mapper.Map<Category>(cat);
 
-                var result = _mapper.Map<Category>(cat);
-                await _repo.AddAsync(result);
-                if (await _repo.SaveAll())
-                {
-                    return CreatedAtRoute("GetCategory", new { id = result.Id }, result);
-                }
+            var cantName = _catRepo.FindByName(cat.CategoryName);
+            if(cantName > 0)
+            {
+                return Conflict();
+            }
+
+            await _repo.AddAsync(result);
+            if (await _repo.SaveAll())
+            {
+                return CreatedAtRoute("GetCategory", new { id = result.Id }, result);
+            }
 
             throw new Exception("Creating the category failed on save");
         }

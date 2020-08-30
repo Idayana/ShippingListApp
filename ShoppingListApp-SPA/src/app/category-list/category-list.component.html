@@ -1,27 +1,4 @@
-<!--<div class="container">
-  <div class="row">
-    <div col-lg-2 col-md-3 col-sm-6>
-      <p *ngFor="let category of categories">{{category.categoryName}}</p>
-    </div>
-  </div>
-</div>
-
-<div class="text-center mt-3">
-  <h2>Categories - {{pagination.totalItems}} found</h2>
-</div>
-
-<div class="container mt-3">
-    <form class="form-inline" #form="ngForm" (ngSubmit)="loadCategories()" novalidate>
-
-  <div class="row">
-    <ng-container *ngFor="let cat of categories" >
-      <div class="col-lg-2 col-md-3 col-sm-6">
-          <app-category-list></app-category-list>
-      </div>
-    </ng-container>
-  </div>
-
-  este codigo es para mostrar y ocultar el formulario
+<!--este codigo es para mostrar y ocultar el formulario
   <ng-template [ngIf]="showForm">
     <form >
       <h3 class="text-center text-primary">Add new category</h3>
@@ -60,7 +37,7 @@
       <tr *ngFor="let cat of categories">
         <td>{{cat.categoryName}}</td>
         <td>
-          <button class="btn btn-primary" (click)="openModal(templateEdit)"><i class="fa fa-pencil-square" aria-hidden="true"></i></button>
+          <button class="btn btn-primary" (click)="edit(cat ,templateEdit)"><i class="fa fa-pencil-square" aria-hidden="true"></i></button>
         </td>
         <td>
             <button class="btn btn-primary" (click)="deleteCategory(cat.categoryId)"><i class="fa fa-trash"></i></button>
@@ -68,7 +45,6 @@
         </td>
       </tr>
     </table>
-
   </div>
 
 </div>
@@ -84,7 +60,7 @@
 
 <ng-template #template>
   <div class="modal-header">
-    <h4 class="modal-title pull-left">New Category</h4>
+    <h5 class="modal-title pull-left">New Category</h5>
     <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
       <span aria-hidden="true">&times;</span>
     </button>
@@ -96,12 +72,12 @@
 
 <ng-template #templateEdit>
   <div class="modal-header">
-    <h4 class="modal-title pull-left">Edit Category</h4>
+    <h5 class="modal-title pull-left">Edit Category</h5>
     <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
   <div class="modal-body">
-    <app-category-edit (cancelAddition)="cancelAdditionMode()"></app-category-edit>
+    <app-category-edit [category]="category" (cancelAddition)="cancelAdditionMode()"></app-category-edit>
   </div>
 </ng-template>

@@ -18,14 +18,6 @@ namespace ShoppingListApi.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Product>()
-                .HasIndex(p => p.ProductName)
-                .IsUnique();
-
-            modelBuilder.Entity<Category>()
-                .HasIndex(c => c.CategoryName)
-                .IsUnique();
-
-            modelBuilder.Entity<Product>()
                 .HasOne(p => p.Category)
                 .WithMany(b => b.Products)
                 .HasForeignKey(p => p.CategoryId);

@@ -6,7 +6,9 @@ declare let alertify: any;
 })
 export class AlertifyService {
 
-constructor() { }
+constructor() { 
+  alertify.defaults.glossary.title = 'ShoppingList';
+}
 
 confirm(message: string, okCallBack: () => any): void {
   alertify.confirm(message, function f(e): void {

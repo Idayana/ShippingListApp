@@ -13,6 +13,7 @@ import { Pagination, PaginatedResult } from 'src/app/_models/pagination';
 })
 export class CategoryListComponent implements OnInit {
   categories: Category[];
+  category: Category | null = null;
   pagination: Pagination;
   showForm = false;
   modalRef: BsModalRef;
@@ -53,6 +54,11 @@ export class CategoryListComponent implements OnInit {
     console.log(this.showForm);
   }*/
 
+  edit(category: Category, template: TemplateRef<any>) {
+    this.category = category;
+    this.openModal(template);
+  }
+
   openModal(template: TemplateRef<any>) {
     this.modalRef = this.modalService.show(template);
   }
@@ -63,7 +69,6 @@ export class CategoryListComponent implements OnInit {
 
   deleteCategory(id: number) {
     this.alertify.confirm('Are you sure you want to delete this category', () => {
-      console.log(id);
       this.categoryService.deleteCategory(id).subscribe(() => {
         this.categories.splice(this.categories.findIndex(m => m.categoryId === id), 1);
         this.alertify.success('Message has been deleted');

@@ -35,7 +35,6 @@ export class CategoryComponent implements OnInit {
     if (this.addCategoryForm.valid)
     {
       this.category = Object.assign({}, this.addCategoryForm.value);
-      console.log(this.category);
       this.categoryService.addCategory(this.category).subscribe(() => {
         this.alertify.success('Category added uccessfully');
         this.addCategoryForm.reset();
@@ -48,7 +47,7 @@ export class CategoryComponent implements OnInit {
   }
 
   cancel() {
-    this.cancelAddition.emit(false);
+    this.router.navigate(['/home']);
   }
 
 }

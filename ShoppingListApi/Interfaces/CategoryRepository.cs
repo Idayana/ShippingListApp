@@ -14,5 +14,8 @@ namespace ShoppingListApi.Interfaces
         {
 
         }
+
+        /// <inheritdoc/>
+        public int FindByName(string name) => GetQueryable().Where(n => n.CategoryName.Equals(name)).Count();
     }
 }

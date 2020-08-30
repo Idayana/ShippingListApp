@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -8,14 +9,15 @@ import { Component, OnInit } from '@angular/core';
 export class HomeComponent implements OnInit {
   additionMode = false;
 
-  constructor() { }
+  constructor(private router: Router) { }
 
   // tslint:disable-next-line: typedef
   ngOnInit() {
   }
 
   additionToggle() {
-    this.additionMode = true;
+    this.router.navigate(['category']);
+    // this.additionMode = true;
   }
 
   cancelAdditionMode(additionMode: boolean) {
