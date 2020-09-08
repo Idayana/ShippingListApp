@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Category } from '../_models/category';
 import { CategoryService } from '../_services/category.service';
@@ -12,10 +12,14 @@ import { Router } from '@angular/router';
 })
 export class CategoryComponent implements OnInit {
   @Output() cancelAddition = new EventEmitter();
+  @Output() catCreated = new EventEmitter<Category>();
   category: Category;
   addCategoryForm: FormGroup;
+  @Input() notModal = true;
 
-  constructor(private categoryService: CategoryService, private alertify: AlertifyService, private fb: FormBuilder,
+  constructor(private categoryService: CategoryService,
+              private alertify: AlertifyService,
+              private fb: FormBuilder,
               private router: Router) { }
 
   // tslint:disable-next-line: typedef
@@ -35,8 +39,11 @@ export class CategoryComponent implements OnInit {
     if (this.addCategoryForm.valid)
     {
       this.category = Object.assign({}, this.addCategoryForm.value);
-      this.categoryService.addCategory(this.category).subscribe(() => {
+      this.categoryService.addCategory(this.category).subscribe((returnedItem: {
+        categoryId: number, categoryName: string
+      }) => {
         this.alertify.success('Category added uccessfully');
+        this.catCreated.emit(returnedItem);
         this.addCategoryForm.reset();
       }, error => {
         this.alertify.error(error);
@@ -47,7 +54,12 @@ export class CategoryComponent implements OnInit {
   }
 
   cancel() {
-    this.router.navigate(['/home']);
+    this.cancelAddition.emit(false);
+    if (this.notModal) {
+      this.router.navigate(['/home']);
+      return;
+    }
+    this.router.navigate(['/categories']);
   }
 
 }

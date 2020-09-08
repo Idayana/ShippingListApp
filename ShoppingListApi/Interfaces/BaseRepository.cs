@@ -10,7 +10,7 @@ using ShoppingListApi.Models;
 
 namespace ShoppingListApi.Interfaces
 {
-    public class BaseRepository <TEntity> : IBaseRepository<TEntity> where TEntity: Entity
+    public abstract class BaseRepository <TEntity> : IBaseRepository<TEntity> where TEntity: Entity
     {
         protected bool disposedValue = false;
         private readonly DataContext _context;
@@ -29,6 +29,7 @@ namespace ShoppingListApi.Interfaces
             await entity.AddAsync(obj);
             return obj;
         }
+
         public void Remove(int id)
         {
             var objToDelete = entity.FirstOrDefault(ent => ent.Id.Equals(id));
@@ -38,6 +39,7 @@ namespace ShoppingListApi.Interfaces
             }
             entity.Remove(objToDelete);
         }
+
         public async Task RemoveAsync (TEntity obj)
         {
             if(obj == null)
@@ -52,13 +54,23 @@ namespace ShoppingListApi.Interfaces
             
         }
 
+        /// <summary>
+        /// Include relations on the TEntity
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        public abstract IQueryable<TEntity> IncludeGet(IQueryable<TEntity> entities);
+
         public async Task<TEntity> Get(int id)
         {
-            return await entity.FindAsync(id);
+            var include = IncludeGet(GetQueryable());
+            return await include.Where(t => t.Id == id).SingleAsync();
         }
+
         public IQueryable<TEntity> GetQueryable(){
             return entity.AsQueryable();
         }
+
         public async Task<PagedList<TEntity>> Query(IQueryable<TEntity> q, PaginationParams pagParams){
         
             return await PagedList<TEntity>.CreateAsync(q, pagParams.PageNumber, pagParams.PageSize);

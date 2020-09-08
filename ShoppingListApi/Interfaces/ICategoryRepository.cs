@@ -16,5 +16,8 @@ namespace ShoppingListApi.Interfaces
         /// <param name="name"></param>
         /// <returns></returns>
         int FindByName(string name);
+        Task<IEnumerable<Category>> GetCategories();
+
+        IQueryable<Category> IncludeGet(IQueryable<Category> entities);
     }
 }

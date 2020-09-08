@@ -1,3 +1,91 @@
-<p>
-  product-list works!
-</p>
+<div class="container mt-5">
+  <div class="row d-flex justify-content-between">
+    <div class="btn-group">
+      <button class="btn btn-primary" (click)="openModal(template)">
+        <i class="fa fa-plus-circle" aria-hidden="true"></i> Add Product
+      </button>
+    </div>
+    <form class="form-inline my-2 my-lg-0">
+      <div [formGroup]="findProductForm" class="form-group">
+        <select class="form-control" formControlName="categoryId"  style="margin-right: 20px;">
+          <option value="">Select</option>
+          <option *ngFor="let cat of categories" [value]="cat.categoryId"  >
+            {{cat.categoryName}}
+          </option>
+        </select> 
+        <input class="form-control" type="text" style="margin-right: 20px;" formControlName="productName" placeholder="Name">
+        <button class="btn btn-primary" (click)="loadProducts()"><i class="fa fa-search" aria-hidden="true"></i></button>
+      </div>
+    </form>
+  </div>
+
+  <div class="row" *ngIf="products.length > 0">
+    <table class="table table-hover" style="cursor: pointer">
+      <tr>
+        <th style="width: 40%">Product</th>
+        <th style="width: 40%">Category</th>
+        <th style="width: 20%">Edit</th>
+        <th style="width: 20%">Delete</th>
+      </tr>
+      <tr *ngFor="let prod of products">
+        <td>{{prod.productName}}</td>
+        <td *ngIf="prod.categoryName != null">{{prod.categoryName}}</td>
+        <td *ngIf="prod.categoryName == null">Sin Categoría</td>
+        <td>
+          <button class="btn btn-primary" (click)="edit(prod ,templateEdit)"><i class="fa fa-pencil-square" aria-hidden="true"></i></button>
+        </td>
+        <td>
+            <button class="btn btn-primary" (click)="deleteProduct(prod.productId)"><i class="fa fa-trash"></i></button>
+          <!-- <button class="btn btn-danger">Delete</button>-->
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row d-flex justify-content-center">
+    <div>
+      <label for="">View &nbsp;</label>
+      <select class="form-control" style="width: 55px; display:inline-flex; padding-right: 5px; padding-left: 5px;" (change)="setItemsPerPage($event)">
+        <option>5</option>
+        <option>10</option>
+        <option>15</option>
+        <option>20</option>
+      </select>
+      <label for="">&nbsp; records at a time.</label>
+    </div>
+    <div>
+      <pagination [boundaryLinks]="true" [totalItems]="pagination.totalItems"
+              [itemsPerPage]="pagination.itemsPerPage"
+              [(ngModel)]="pagination.currentPage"
+              (pageChanged)="pageChanged($event)"
+            previousText="&lsaquo;" nextText="&rsaquo;" firstText="&laquo;" lastText="&raquo;">
+      </pagination>
+    </div>
+  </div>
+</div>
+
+<ng-template #template>
+  <div class="modal-header">
+    <h5 class="modal-title pull-left">New Product</h5>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <app-product-add [categories]="categories" [notModal]="false" (cancelAddition)="cancelAdditionMode()" (prodCreated)="prodCreated($event)"></app-product-add>
+  </div>
+</ng-template>
+
+<ng-template #templateEdit>
+  <div class="modal-header">
+    <h5 class="modal-title pull-left">Edit Product</h5>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <app-product-edit [product]="product" [categories]="categories" (cancelAddition)="cancelAdditionMode()" (prodModified)="prodModified($event)"></app-product-edit>
+  </div>
+</ng-template>

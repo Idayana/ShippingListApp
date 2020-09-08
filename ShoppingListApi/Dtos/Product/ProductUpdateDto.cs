@@ -8,7 +8,6 @@ namespace ShoppingListApi.Dtos.Product
 {
     public class ProductUpdateDto
     {
-        [Required]
         public string ProductName { get; set; }
         public int? CategoryId { get; set; }
     }

@@ -16,6 +16,7 @@ import {CategoryService } from '../app/_services/category.service';
 import { HomeComponent } from './home/home.component';
 import { appRoutes } from './routes';
 import { ListsResolver } from './_resolvers/lists.resolver';
+import { ProductListResolver } from './_resolvers/product-list.resolver';
 import { CategoryComponent } from './category/category.component';
 import { CategoryListComponent } from './category-list/category-list.component';
 import { CategoryEditComponent } from './category-edit/category-edit.component';
@@ -51,7 +52,8 @@ import { ProductEditComponent } from './products/product-edit/product-edit.compo
     ErrorInterceptorProvider,
     AlertifyService,
     CategoryService,
-    ListsResolver
+    ListsResolver,
+    ProductListResolver
   ],
   bootstrap: [AppComponent]
 })

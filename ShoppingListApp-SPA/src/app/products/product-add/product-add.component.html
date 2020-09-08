@@ -1,3 +1,39 @@
-<p>
-  product-add works!
-</p>
+<!--<form>
+  <div class="form-group">
+    <input type="text" 
+      [ngClass]="{'is-invalid': addProductForm.get('productName').errors && addProductForm.get('productName').touched}" 
+      class="form-control is-invalid" formControlName="productName" placeholder="Name">
+        <div class="invalid-feedback"> Please enter the name of the product</div>
+    <label for="exampleFormControlSelect1">Example select</label>
+      <select class="form-control" id="exampleFormControlSelect1" [(ngModel)]="selected">
+        <option [ngValue]="cat.categoryName" *ngFor="let cat of categories">1</option>
+      </select>  
+  </div>
+
+  <div class="form-group text-center">
+    <button class="btn btn-success mr-2" [disabled]="!addProductForm.valid" type="submit">Add Product</button>
+    <button class="btn btn-secondary" type="button" (click)="cancel()">Cancel</button>
+  </div>
+</form>-->
+<div [ngClass]="{'container mt-5' : notModal}">
+  <div [ngClass]="{'row justify-content-center' : notModal}">
+    <div [ngClass]="{'col-4' : notModal}">
+      <form>
+        <h6>Name</h6>
+        <div [formGroup]="addProductForm" class="form-group">
+          <input class="form-control" type="text" formControlName="productName" placeholder="Name">
+          <div class="invalid-feedback"> Please enter the name of the category</div>
+          <h6 style="margin-top: 15px;">Categoría</h6>
+            <select class="form-control" formControlName="categoryId">
+              <option [ngValue]="cat.categoryId" *ngFor="let cat of categoriesList">{{cat.categoryName}}</option>
+            </select> 
+        </div>
+      
+        <div class="form-group text-center">
+          <button class="btn btn-success mr-2" type="button" (click)="addProduct()">Add Product</button>
+          <button class="btn btn-secondary" type="button" (click)="cancel()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -15,7 +15,7 @@ export class CategoryListComponent implements OnInit {
   categories: Category[];
   category: Category | null = null;
   pagination: Pagination;
-  showForm = false;
+  // showForm = false;
   modalRef: BsModalRef;
   additionMode = false;
 
@@ -34,8 +34,27 @@ export class CategoryListComponent implements OnInit {
     });
   }
 
+  catCreated(cat: Category){
+    this.categories =  [cat, ...this.categories];
+ }
+
+ /* Evento para actualizar el listado de categorias luego de modificar una
+ catModified(cat: Category){
+   const catMod = this.categories.find(c => c.categoryId === cat.categoryId);
+   catMod.categoryName = catMod.categoryName;
+   if ( catMod == null) {
+    this.alertify.error('Product not found');
+   }
+   // return prodMod;
+}*/
+
   pageChanged(event: any): void {
     this.pagination.currentPage = event.page;
+    this.loadCategories();
+  }
+
+  setItemsPerPage(event: any) {
+    this.pagination.itemsPerPage = event.target.value;
     this.loadCategories();
   }
 
@@ -71,9 +90,10 @@ export class CategoryListComponent implements OnInit {
     this.alertify.confirm('Are you sure you want to delete this category', () => {
       this.categoryService.deleteCategory(id).subscribe(() => {
         this.categories.splice(this.categories.findIndex(m => m.categoryId === id), 1);
-        this.alertify.success('Message has been deleted');
+        this.alertify.success('Category has been deleted');
+        this.loadCategories();
       }, error => {
-        this.alertify.error('Failed to delete the message');
+        this.alertify.error('Failed to delete the category');
       });
     });
   }

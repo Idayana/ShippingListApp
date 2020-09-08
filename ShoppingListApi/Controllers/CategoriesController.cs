@@ -16,12 +16,11 @@ namespace ShoppingListApi.Controllers
     [ApiController]
     public class CategoriesController : ControllerBase
     {
-        private readonly IBaseRepository<Category> _repo;
         private readonly IMapper _mapper;
         private readonly ICategoryRepository _catRepo;
-        public CategoriesController(IBaseRepository<Category> repo, IMapper mapper, ICategoryRepository catRepo)
+        public CategoriesController(IMapper mapper, ICategoryRepository catRepo)
         {
-            _repo = repo;
+  
             _mapper = mapper;
             _catRepo = catRepo;
 
@@ -42,10 +41,11 @@ namespace ShoppingListApi.Controllers
                 return Conflict();
             }
 
-            await _repo.AddAsync(result);
-            if (await _repo.SaveAll())
+            await _catRepo.AddAsync(result);
+            if (await _catRepo.SaveAll())
             {
-                return CreatedAtRoute("GetCategory", new { id = result.Id }, result);
+                var catMapped = _mapper.Map<CategoryListDto>(result);
+                return CreatedAtRoute("GetCategory", new { id = catMapped.CategoryId }, catMapped);
             }
 
             throw new Exception("Creating the category failed on save");
@@ -56,7 +56,7 @@ namespace ShoppingListApi.Controllers
         {
             try
             {
-                var category = await _repo.Get(id);
+                var category = await _catRepo.Get(id);
                 if (category == null)
                 {
                     return NotFound();
@@ -75,7 +75,7 @@ namespace ShoppingListApi.Controllers
         {
             try
             {
-                var categories = await _repo.Get(pagParams);
+                var categories = await _catRepo.Get(pagParams);
                 if (categories == null)
                 {
                     return NotFound();
@@ -83,6 +83,26 @@ namespace ShoppingListApi.Controllers
                 var catToReturn = _mapper.Map<IEnumerable<CategoryListDto>>(categories);
                 Response.AddPagination(categories.CurrentPage,categories.PageSize,categories.TotalCount, categories.TotalPages);
                 return Ok(catToReturn);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return NoContent();
+            }
+        }
+
+        [HttpGet("allCategories")]
+        public async Task<IActionResult> GetAllCategories()
+        {
+            try
+            {
+                var cat = await _catRepo.GetCategories();
+                if(cat == null)
+                {
+                    return NoContent();
+                }
+                var catList = _mapper.Map<IEnumerable<CategoryListDto>>(cat);
+                return Ok(catList);
             }
             catch (Exception e)
             {
@@ -99,15 +119,22 @@ namespace ShoppingListApi.Controllers
                 return BadRequest(ModelState);
             }
 
-            var catFromRepo = await _repo.Get(id);
+            var catFromRepo = await _catRepo.Get(id);
             if (catFromRepo == null)
             {
                 return NotFound();
             }
             var result = _mapper.Map(cat, catFromRepo);
-            await _repo.UpdateAsync(result);
+
+            var cantName = _catRepo.FindByName(cat.CategoryName);
+            if (cantName > 0)
+            {
+                return Conflict();
+            }
+
+            await _catRepo.UpdateAsync(result);
  
-            if (await _repo.SaveAll())
+            if (await _catRepo.SaveAll())
             {
                 var catUpdated = _mapper.Map<CategoryUpdateDto>(result);
                 return Ok(catUpdated);
@@ -119,14 +146,14 @@ namespace ShoppingListApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> RemoveCategory(int id)
         {
-            var catToRemove = await _repo.Get(id);
+            var catToRemove = await _catRepo.Get(id);
             if(catToRemove == null)
             {
                 return NotFound();
             }
-            await _repo.RemoveAsync(catToRemove);
+            await _catRepo.RemoveAsync(catToRemove);
 
-            if (await _repo.SaveAll())
+            if (await _catRepo.SaveAll())
                 return Ok();
 
             return BadRequest("Failed to delete the category");

@@ -17,5 +17,18 @@ namespace ShoppingListApi.Interfaces
 
         /// <inheritdoc/>
         public int FindByName(string name) => GetQueryable().Where(n => n.CategoryName.Equals(name)).Count();
+
+        public async Task<IEnumerable<Category>> GetCategories()
+        {
+            var cat = await GetQueryable().ToListAsync();
+            return cat;
+        }
+
+        public override IQueryable<Category> IncludeGet(IQueryable<Category> entities)
+        {
+            return entities;
+        }
+
+     
     }
 }

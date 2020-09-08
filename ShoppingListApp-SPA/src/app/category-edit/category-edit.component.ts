@@ -25,6 +25,7 @@ export class CategoryEditComponent implements OnInit {
       this.category = data.category;
     });*/
     this.createEditForm();
+    console.log(this.category);
   }
 
   createEditForm() {
@@ -34,9 +35,11 @@ export class CategoryEditComponent implements OnInit {
   }
 
   updateCategory() {
+    console.log(this.category);
     this.categoryService.updateCategory(this.category.categoryId, this.category).subscribe(next => {
       this.alertify.success('Category updated successfully');
       this.editForm.reset();
+      this.cancelAddition.emit(false);
     }, error => {
       this.alertify.error(error);
     });

@@ -14,20 +14,38 @@ namespace ShoppingListApi.Helpers
         public AutoMapperProfiles()
         {
             CreateBothMaps<CategoryUpdateDto, Category>();
+
             CreateBothMaps<CategoryCreateDto, Category>();
+
             CreateMap<Category, CategoryListDto>()
                 .ForMember(dest => dest.CategoryId, opt =>
                 {
                     opt.MapFrom(src => src.Id);
                 });
-            CreateBothMaps<Product, ProductCreateDto>();
-            CreateBothMaps<Product, ProductUpdateDto>();
+
+            CreateBothMaps<Product, ProductCreateDto>() ;
+            //CreateBothMaps<Product, ProductUpdateDto>();
+            CreateMap<ProductUpdateDto, Product>()
+                .ForMember(dest => dest.ProductName, opt => opt.PreCondition(t => t.ProductName != null))
+                .ForMember(dest => dest.CategoryId, opt => opt.MapFrom(source => source.CategoryId));
+
+
+
+            CreateMap<Product, ProductUpdateDto>()
+                .ForMember(dest => dest.ProductName, opt =>
+                {
+                    opt.MapFrom(src => src.ProductName);
+                });
+          
             CreateMap<Product, ProductListDto>()
                 .ForMember(dest => dest.ProductName, opt => {
                 opt.MapFrom(src => src.ProductName);
                 })
                 .ForMember(dest => dest.CategoryName, opt => {
                 opt.MapFrom(src => src.Category.CategoryName);
+                })
+                .ForMember(dest => dest.ProductId, opt => {
+                    opt.MapFrom(src => src.Id);
                 });
         }
 

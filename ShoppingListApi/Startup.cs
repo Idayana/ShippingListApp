@@ -36,7 +36,7 @@ namespace ShoppingListApi
         {
             services.AddControllers(op => {
                 op.Filters.Add(typeof(ExceptionFilter));
-            });
+            }).AddNewtonsoftJson();
             services.AddScoped<DataContext>();
             services.AddDbContextPool<DataContext>((servicesProvider, options)=>
             {

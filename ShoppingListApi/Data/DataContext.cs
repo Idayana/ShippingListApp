@@ -20,7 +20,13 @@ namespace ShoppingListApi.Data
             modelBuilder.Entity<Product>()
                 .HasOne(p => p.Category)
                 .WithMany(b => b.Products)
-                .HasForeignKey(p => p.CategoryId);
+                .HasForeignKey(p => p.CategoryId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<Category>()
+                .HasMany(c => c.Products)
+                .WithOne(p => p.Category)
+                .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<ProductTranslation>()
                 .HasOne<Product>()

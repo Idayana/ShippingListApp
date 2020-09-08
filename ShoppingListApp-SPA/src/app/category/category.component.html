@@ -1,6 +1,6 @@
-<div class="container mt-5">
-  <div class="row justify-content-center">
-    <div class="col-4">
+<div [ngClass]="{'container mt-5' : notModal}">
+  <div [ngClass]="{'row justify-content-center' : notModal}">
+    <div [ngClass]="{'col-4' : notModal}">
       <form [formGroup]="addCategoryForm" (ngSubmit)="addCategory()">
         <div class="form-group">
           <input type="text" 
@@ -17,3 +17,4 @@
     </div>
   </div>
 </div>
+

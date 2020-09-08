@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
@@ -13,6 +13,11 @@ export class HomeComponent implements OnInit {
 
   // tslint:disable-next-line: typedef
   ngOnInit() {
+  }
+
+  additionProdToggle() {
+    this.router.navigate(['product']);
+    // this.additionMode = true;
   }
 
   additionToggle() {

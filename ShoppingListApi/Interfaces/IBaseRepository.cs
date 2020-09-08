@@ -20,7 +20,7 @@ namespace ShoppingListApi.Interfaces
          Task<TEntity> UpdateAsync(TEntity obj);
          Task<bool> ExistsAsync(TEntity obj);
          IQueryable<TEntity> GetQueryable();
-        Task<PagedList<TEntity>> Query(IQueryable<TEntity> q, PaginationParams pagParams);
-        IQueryable<TEntity> Include(IQueryable<TEntity> q, string relation);
+         Task<PagedList<TEntity>> Query(IQueryable<TEntity> q, PaginationParams pagParams);
+         IQueryable<TEntity> Include(IQueryable<TEntity> q, string relation);
     }
 }

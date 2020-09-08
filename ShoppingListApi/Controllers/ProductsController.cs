@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -14,12 +15,14 @@ namespace ShoppingListApi.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        private readonly IBaseRepository<Product> _repo;
+        private readonly IProductRepository _repo;
         private readonly IMapper _mapper;
-        public ProductsController(IBaseRepository<Product> repo, IMapper mapper)
+        private readonly ICategoryRepository _catRepo;
+        public ProductsController(IProductRepository repo, IMapper mapper, ICategoryRepository catRepo)
         {
             _repo = repo;
             _mapper = mapper;
+            _catRepo = catRepo;
 
         }
         [HttpPost]
@@ -30,12 +33,28 @@ namespace ShoppingListApi.Controllers
                 return BadRequest(ModelState);
              }
 
-            var result = _mapper.Map<Product>(prod);
-            await _repo.AddAsync(result);
+            var prodMapped = _mapper.Map<Product>(prod);
+
+            var cantName = _repo.FindByName(prodMapped.ProductName);
+            if(cantName > 0)
+            {
+                return Conflict();
+            }
+
+            if(prodMapped.CategoryId != null)
+            {
+                var cat = await _catRepo.Get((int)prodMapped.CategoryId);
+                if(cat == null) throw new Exception($"Category `{prodMapped.CategoryId}`not found");
+                
+                prodMapped.Category = cat;
+            }
+
+            await _repo.AddAsync(prodMapped);
 
             if(await _repo.SaveAll())
             {
-                return CreatedAtRoute("GetProduct", new { id = result.Id }, result);
+                var prodToReturn = _mapper.Map<ProductListDto>(prodMapped);
+                return CreatedAtRoute("GetProduct", new { id = prodToReturn.ProductId }, prodToReturn);
             }
             throw new Exception("Creating the product failed on save");
         }
@@ -46,11 +65,12 @@ namespace ShoppingListApi.Controllers
             try
             {
                 var product = await _repo.Get(id);
+
                 if(product == null)
                 {
                     return NotFound();
                 }
-                return Ok(product);
+                return Ok(_mapper.Map<ProductListDto>(product));
             }
             catch(Exception e)
             {
@@ -60,9 +80,35 @@ namespace ShoppingListApi.Controllers
         }
 
        [HttpGet]
-        public async Task<IActionResult> GetProducts([FromQuery] PaginationParams pagParams)
+        public async Task<IActionResult> GetProducts([FromQuery] ProductParams prodParams)
         {
             try
+            {
+                if (string.IsNullOrEmpty(prodParams.ProductName))
+                {
+                    prodParams.ProductName = null;
+                }
+
+                if (prodParams.CategoryId == 0)
+                {
+                    prodParams.CategoryId = 0;
+                }
+
+                var products = await _repo.ProductByFilters(prodParams);
+                if (products == null)
+                {
+                    return NotFound();
+                }
+                var prodToReturn = _mapper.Map<IEnumerable<ProductListDto>>(products);
+                Response.AddPagination(products.CurrentPage, products.PageSize, products.TotalCount, products.TotalPages);
+                return Ok(prodToReturn);
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return NoContent();
+            }
+            /*try
             {
                 var query = _repo.GetQueryable();
                 var products = await _repo.Query(_repo.Include(query, "Category"), pagParams); 
@@ -79,13 +125,13 @@ namespace ShoppingListApi.Controllers
             {
                 Console.WriteLine(e.Message);
                 return NoContent();
-            }
+            }*/
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateProduct([FromBody] ProductUpdateDto prod, int id)
+        public async Task<IActionResult> UpdateProduct([FromBody] ProductUpdateDto prodUpDto, int id)
         {
-            if (!ModelState.IsValid || prod == null)
+            if (!ModelState.IsValid || prodUpDto == null)
             {
                 return BadRequest(ModelState);
             }
@@ -96,12 +142,27 @@ namespace ShoppingListApi.Controllers
                 return NotFound();
             }
 
-            var prodUpdate = _mapper.Map(prod, prodFromRepo);
-            await _repo.UpdateAsync(prodUpdate);
+            var prodMapped = _mapper.Map(prodUpDto, prodFromRepo);
+
+            var cantName = _repo.FindByName(prodMapped.ProductName);
+            if (cantName > 0)
+            {
+                return Conflict();
+            }
+
+            if (prodMapped.CategoryId != null)
+            {
+                var cat = await _catRepo.Get((int)prodMapped.CategoryId);
+                if (cat == null) throw new Exception($"Category `{prodMapped.CategoryId}`not found");
+
+                prodMapped.Category = cat;
+            }
+
+            await _repo.UpdateAsync(prodMapped);
 
             if(await _repo.SaveAll())
             {
-                var result = _mapper.Map<ProductUpdateDto>(prodUpdate);
+                var result = _mapper.Map<ProductListDto>(prodMapped);
                 return Ok(result);
             }
             throw new Exception($"Error updating product {id}");
